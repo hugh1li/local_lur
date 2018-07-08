@@ -3,7 +3,6 @@ Calculate and then sent back to arcgis to plot
 
 box_200 <- read_csv("raw_data/centroid_200_before_raster_cal.csv")
 
--9999 meaning no data, I will treat with 0 then, though previouly I will change land use ones to be 25
 
 # check class
 temp <- map_df(box_200, class) %>% gather()
@@ -12,8 +11,22 @@ temp <- map_df(box_200, class) %>% gather()
 temp <- map_df(box_200, ~sum(.x == -9999)) %>% gather()
 table(temp$value)
 
-# -9999 to be 0
-box_200[box_200 == -9999] <- 0 
+temp[temp$value == 6, 'key']
+
+key       
+<chr>     
+  1 rest100m  
+2 elevation  # trouble for the COA bounday, the least value is 208
+3 trkdenall1
+4 AGRI500m  
+5 INDUS500x0
+6 alldiesaad
+7 distall   
+8 TRKDENSMAJ
+9 houseden30
+
+# -9999 to remove
+box_200 <- box_200 %>% filter(elevation > -9999)
 
 # dist the smallest value to be the second smallest value 4.5
 box_200$distall[box_200$distall == 0] <- 4.5
@@ -22,7 +35,7 @@ box_200$Eucdist_pm[box_200$Eucdist_pm == 0] <- 58.5
 
 # calculate COA hoa and mixing state ----
 
-box_200_01 <- box_200 %>% mutate(coa_pub = 1857.351 - 4.85 * elevation + rest100m * 7.312, hoa_pub = 839 + 67.1 * trkdenall1 - 0.0199 * AGRI500m + 1/Eucdist_pm* 4.59 * 10^4 + INDUS500x0 *4.39*10^-4 + 60.5 * alldiesaad * 1/distall/distall, mixing_state_pub = -0.473 + 0.0212 * TRKDENSMAJ + 7.91 * 10^-5 *houseden30 * 25 + 11.9 * pointde_ne) %>% select(-coa, -hoa)
+box_200_01 <- box_200 %>% mutate(coa_pub = 1857.351 - 4.85 * elevation + rest100m * 7.312, hoa_pub = 1360 + 90.8 * trkdenall1 - 0.0114 * AGRI500m + 1/Eucdist_pm* 3.99 * 10^4, mixing_state_pub = -0.473 + 0.0212 * TRKDENSMAJ + 7.91 * 10^-5 *houseden30 * 25 + 11.9 * pointde_ne) %>% select(-coa, -hoa)
 
 # compare with qing's value
 summary(box_200_01$coa_pub)

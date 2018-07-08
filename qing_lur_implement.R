@@ -74,11 +74,12 @@ sqrt(mean(M_COA^2))
 HOA <- make_lur(dat1 = LUR_input_f, response = "HOA", exclude = unwanted, dep_col = 262)
 # validation 
 
-HOA_lm <- lm(formula( "HOA ~  + TRKDENALL100 + LUAGRI500 + EucDistinv_PM + LUINDUS5000 + ALLDIESAADT_DIS2"), sx)
+HOA_lm <- lm(formula( "HOA ~  + TRKDENALL100 + LUAGRI500 + EucDistinv_PM"), sx)
 
-HOA_lm <- lm(formula( "HOA ~  + TRKDENALL100 + LUAGRI500 + EucDistinv_PM + LUINDUS5000"), sx)
-
+temp <- lm(formula( "HOA ~  + TRKDENALL100 + LUAGRI500 "), sx)
+  
 summary(HOA_lm)
+0.74, adj 0.73
 
 plot(HOA_lm, which = 4)
 car::vif(HOA_lm)
@@ -89,35 +90,34 @@ car::vif(HOA_lm)
 # LOOCV R2
 loocv_HOA <- cv.lm(HOA_lm$model, HOA_lm, m=72, legend.pos = "topright")
 cor(loocv_HOA$HOA,loocv_HOA$cvpred)**2
-0.74
+0.69
 
 # 3 fold
 fold3_HOA <- cv.lm(HOA_lm$model, HOA_lm, m=3, legend.pos = "topright")
 cor(fold3_HOA$HOA, fold3_HOA$cvpred)**2
-0.74
+0.70
 
 # 10 fold
 fold10_HOA <- cv.lm(HOA_lm$model, HOA_lm, m=10, legend.pos = "topright")
 cor(fold10_HOA$HOA, fold3_HOA$cvpred)**2
-0.75
+0.70
 
 # mean studentized prediction residuals (sd used n-1)
 M_HOA<-rstudent(HOA_lm)
 mean(M_HOA)
-0.00168
+-0.00232
 # root mean square of studentized
 sqrt(mean(M_HOA^2))
-1
+1.01
 
 # different R2
 library(relaimpo)
-calc.relimp(HOA_lm, type="lmg") # meet with singular error, coz your vars correlate with each other
-calc.relimp(HOA_lm, type = c("lmg", "last", "first", "betasq", "pratt", "genizi", "car")) # nope, cannot work out
+calc.relimp(HOA_lm, type="lmg") 
 
-# calculate correlation of these vars
-HOA_cor <- sx %>% dplyr::select(TRKDENALL100, LUAGRI500, EucDistinv_PM, LUINDUS5000, ALLDIESAADT_DIS2)
-
-cor(HOA_cor) # find alldiesaadt_dis2 and trkdenall100 highly correlated 0.68
+# # calculate correlation of these vars
+# HOA_cor <- sx %>% dplyr::select(TRKDENALL100, LUAGRI500, EucDistinv_PM, LUINDUS5000, ALLDIESAADT_DIS2)
+# 
+# cor(HOA_cor) # find alldiesaadt_dis2 and trkdenall100 highly correlated 0.68
 
 
 
