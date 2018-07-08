@@ -47,6 +47,17 @@ loocv_COA <- cv.lm(COA_lm$model, COA_lm, m=72, legend.pos = "topright")
 cor(loocv_COA$COA,loocv_COA$cvpred)**2
 0.67
 
+# 3 fold valdation
+fold3_COA <- cv.lm(COA_lm$model, COA_lm, m=3, legend.pos = "topright")
+cor(fold3_COA$COA, fold3_COA$cvpred)**2
+0.63
+# 10 fold
+fold10_COA <- cv.lm(COA_lm$model, COA_lm, m=10, legend.pos = "topright")
+cor(fold10_COA$COA, fold10_COA$cvpred)**2
+0.67
+
+
+
 # mean studentized prediction residuals (sd used n-1)
 M_COA <-rstudent(COA_lm)
 mean(M_COA)
@@ -55,7 +66,10 @@ mean(M_COA)
 sqrt(mean(M_COA^2))
 1.01
 
-# HOA ---------------------------------------------------------------------
+
+
+
+# HOA with industrial NEI---------------------------------------------------------------------
 # HOA <- make_lur(dat1 = LUR_input_f, response = "HOA", dep_col = 288)
 HOA <- make_lur(dat1 = LUR_input_f, response = "HOA", exclude = unwanted, dep_col = 262)
 # validation 
@@ -77,6 +91,16 @@ loocv_HOA <- cv.lm(HOA_lm$model, HOA_lm, m=72, legend.pos = "topright")
 cor(loocv_HOA$HOA,loocv_HOA$cvpred)**2
 0.74
 
+# 3 fold
+fold3_HOA <- cv.lm(HOA_lm$model, HOA_lm, m=3, legend.pos = "topright")
+cor(fold3_HOA$HOA, fold3_HOA$cvpred)**2
+0.74
+
+# 10 fold
+fold10_HOA <- cv.lm(HOA_lm$model, HOA_lm, m=10, legend.pos = "topright")
+cor(fold10_HOA$HOA, fold3_HOA$cvpred)**2
+0.75
+
 # mean studentized prediction residuals (sd used n-1)
 M_HOA<-rstudent(HOA_lm)
 mean(M_HOA)
@@ -84,6 +108,11 @@ mean(M_HOA)
 # root mean square of studentized
 sqrt(mean(M_HOA^2))
 1
+
+# different R2
+library(relaimpo)
+calc.relimp(HOA_lm, type="lmg") # meet with singular error, coz your vars correlate with each other
+calc.relimp(HOA_lm, type = c("lmg", "last", "first", "betasq", "pratt", "genizi", "car")) # nope, cannot work out
 
 
 # chi ---------------------------------------------------------------------
@@ -110,6 +139,15 @@ car::vif(chi_lm)
 loocv_chi <- cv.lm(chi_lm$model, chi_lm, m=72, legend.pos = "topright")
 cor(loocv_chi$chi,loocv_chi$cvpred)**2
 0.60 (compared to 0.65 and adj 0.63)
+
+# 3 fold r2 
+fold3_chi <- cv.lm(chi_lm$model, chi_lm, m=3, legend.pos = "topright")
+cor(fold3_chi$chi,fold3_chi$cvpred)**2
+
+# 10 fold r2 
+fold10_chi <- cv.lm(chi_lm$model, chi_lm, m=10, legend.pos = "topright")
+cor(fold10_chi$chi,fold10_chi$cvpred)**2
+
 
 # mean studentized prediction residuals (sd used n-1)
 M_chi <- rstudent(chi_lm)
