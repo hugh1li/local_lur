@@ -8,6 +8,10 @@ box_200 <- read_csv("raw_data/centroid_200_before_raster_cal.csv")
 # check class
 temp <- map_df(box_200, class) %>% gather()
 
+# check how many -9999 for each column
+temp <- map_df(box_200, ~sum(.x == -9999)) %>% gather()
+table(temp$value)
+
 # -9999 to be 0
 box_200[box_200 == -9999] <- 0 
 
