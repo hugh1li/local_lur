@@ -69,7 +69,7 @@ sqrt(mean(M_COA^2))
 
 
 
-# HOA with industrial NEI---------------------------------------------------------------------
+# HOA---------------------------------------------------------------------
 # HOA <- make_lur(dat1 = LUR_input_f, response = "HOA", dep_col = 288)
 HOA <- make_lur(dat1 = LUR_input_f, response = "HOA", exclude = unwanted, dep_col = 262)
 # validation 
@@ -113,6 +113,12 @@ sqrt(mean(M_HOA^2))
 library(relaimpo)
 calc.relimp(HOA_lm, type="lmg") # meet with singular error, coz your vars correlate with each other
 calc.relimp(HOA_lm, type = c("lmg", "last", "first", "betasq", "pratt", "genizi", "car")) # nope, cannot work out
+
+# calculate correlation of these vars
+HOA_cor <- sx %>% dplyr::select(TRKDENALL100, LUAGRI500, EucDistinv_PM, LUINDUS5000, ALLDIESAADT_DIS2)
+
+cor(HOA_cor) # find alldiesaadt_dis2 and trkdenall100 highly correlated 0.68
+
 
 
 # chi ---------------------------------------------------------------------
