@@ -76,7 +76,7 @@ HOA <- make_lur(dat1 = LUR_input_f, response = "HOA", exclude = unwanted, dep_co
 
 HOA_lm <- lm(formula( "HOA ~  + TRKDENALL100 + LUAGRI500 + EucDistinv_PM + LUINDUS5000 + ALLDIESAADT_DIS2"), sx)
 
-HOA_lm <- lm(formula( "HOA ~  + TRKDENALL100 + LUAGRI500 + EucDistinv_PM + LUINDUS5000 + ALLDIESAADT_DIS2"), sx)
+HOA_lm <- lm(formula( "HOA ~  + TRKDENALL100 + LUAGRI500 + EucDistinv_PM + LUINDUS5000"), sx)
 
 summary(HOA_lm)
 
