@@ -74,12 +74,10 @@ sqrt(mean(M_COA^2))
 HOA <- make_lur(dat1 = LUR_input_f, response = "HOA", exclude = unwanted, dep_col = 262)
 # validation 
 
-HOA_lm <- lm(formula( "HOA ~  + TRKDENALL100 + LUAGRI500 + EucDistinv_PM"), sx)
+HOA_lm <- lm(formula( "HOA ~  + TRKDENALL100 + LUAGRI500 "), sx)
 
-temp <- lm(formula( "HOA ~  + TRKDENALL100 + LUAGRI500 "), sx)
-  
 summary(HOA_lm)
-0.74, adj 0.73
+0.72, adj 0.71
 
 plot(HOA_lm, which = 4)
 car::vif(HOA_lm)
@@ -95,17 +93,17 @@ cor(loocv_HOA$HOA,loocv_HOA$cvpred)**2
 # 3 fold
 fold3_HOA <- cv.lm(HOA_lm$model, HOA_lm, m=3, legend.pos = "topright")
 cor(fold3_HOA$HOA, fold3_HOA$cvpred)**2
-0.70
+0.68
 
 # 10 fold
 fold10_HOA <- cv.lm(HOA_lm$model, HOA_lm, m=10, legend.pos = "topright")
 cor(fold10_HOA$HOA, fold3_HOA$cvpred)**2
-0.70
+0.68
 
 # mean studentized prediction residuals (sd used n-1)
 M_HOA<-rstudent(HOA_lm)
 mean(M_HOA)
--0.00232
+-0.0017
 # root mean square of studentized
 sqrt(mean(M_HOA^2))
 1.01

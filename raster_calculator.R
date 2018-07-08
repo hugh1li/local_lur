@@ -35,7 +35,7 @@ box_200$Eucdist_pm[box_200$Eucdist_pm == 0] <- 58.5
 
 # calculate COA hoa and mixing state ----
 
-box_200_01 <- box_200 %>% mutate(coa_pub = 1857.351 - 4.85 * elevation + rest100m * 7.312, hoa_pub = 1360 + 90.8 * trkdenall1 - 0.0114 * AGRI500m + 1/Eucdist_pm* 3.99 * 10^4, mixing_state_pub = -0.473 + 0.0212 * TRKDENSMAJ + 7.91 * 10^-5 *houseden30 * 25 + 11.9 * pointde_ne) %>% select(-coa, -hoa)
+box_200_01 <- box_200 %>% mutate(coa_pub = 1857.351 - 4.85 * elevation + rest100m * 7.312, hoa_pub = 1470 + 92.1 * trkdenall1 - 0.0127 * AGRI500m, mixing_state_pub = -0.473 + 0.0212 * TRKDENSMAJ + 7.91 * 10^-5 *houseden30 * 25 + 11.9 * pointde_ne) %>% select(-coa, -hoa)
 
 # compare with qing's value
 summary(box_200_01$coa_pub)
