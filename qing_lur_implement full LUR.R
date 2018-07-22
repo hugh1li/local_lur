@@ -1,3 +1,6 @@
+# dep_col in LUR function  
+# not 298, coz duplicates removal code change order already
+
 source('~/Box Sync/from_dropbox/ACE hugh/Github_CAPS_spatial/make_lur.R', echo=TRUE)
 
 library(tidyverse)
@@ -12,7 +15,7 @@ zero_filter = LUR_input_02 %>% map_dbl(~sum(.x == 0)/nrow(LUR_input_02))
 filter_25  = LUR_input_02 %>% map_dbl(~sum(.x == 25)/nrow(LUR_input_02))
 LUR_input_f = LUR_input_02[zero_filter < 0.5 & filter_25 < 0.5]
 
-LUR_input_f = LUR_input_f %>% mutate(chi = 1 - chi)
+LUR_input_f = LUR_input_f %>% mutate(chi = 1 - chi) # changing to 1 minus here
 ignore_list <- names(LUR_input_f)[1:262]
 
 sx <- LUR_input_f
@@ -28,7 +31,7 @@ unwanted6 <- names(dplyr::select(LUR_input_f, contains('Ni')))
 
 unwanted <- c(unwanted1, unwanted2, unwanted3, unwanted4, unwanted5_01, unwanted6)
 
-# COA ---------------------------------------------------------------------
+# COA full ---------------------------------------------------------------------
 # not 298, coz duplicates removal code change order already
 COA <- make_lur(dat1 = LUR_input_f, response = "COA", dep_col = 262)
 
@@ -69,7 +72,34 @@ sqrt(mean(M_COA^2))
 
 
 
-# HOA---------------------------------------------------------------------
+
+# COA no elevation -----------------------------------------------------
+COA_unwanted <- 'Elevation'
+COA <- make_lur(dat1 = LUR_input_f, response = "COA", dep_col = 262, exclude =  COA_unwanted)
+
+COA_lm <- lm(formula("COA ~  + PointDe_Rest_100meters + LUCOMM1000"), sx)
+summary(COA_lm)
+0.69, adj 0.68
+plot(COA_lm, which = 4)
+car::vif(COA_lm)
+
+# moran's I
+# todo
+
+# 3 fold valdation
+fold3_COA <- cv.lm(COA_lm$model, COA_lm, m=3, legend.pos = "topright")
+cor(fold3_COA$COA, fold3_COA$cvpred)**2
+0.62
+
+# mean studentized prediction residuals (sd used n-1)
+M_COA <-rstudent(COA_lm)
+mean(M_COA)
+
+# root mean square of studentized
+sqrt(mean(M_COA^2))
+
+
+# HOA full 3 or 2 ---------------------------------------------------------------------
 # HOA <- make_lur(dat1 = LUR_input_f, response = "HOA", dep_col = 288)
 HOA <- make_lur(dat1 = LUR_input_f, response = "HOA", exclude = unwanted, dep_col = 262)
 # validation 
@@ -117,6 +147,70 @@ calc.relimp(HOA_lm, type="lmg")
 # 
 # cor(HOA_cor) # find alldiesaadt_dis2 and trkdenall100 highly correlated 0.68
 
+
+
+# HOA source specific -----------------------------------------------------
+
+unwanted_HOA <- names(dplyr::select(LUR_input_f, contains('LUAGRI')))
+HOA_unwanted <- c(unwanted, unwanted_HOA)
+HOA <- make_lur(dat1 = LUR_input_f, response = "HOA", exclude = HOA_unwanted, dep_col = 262)
+HOA_lm <- lm(formula( "HOA ~  + TRKDENALL100 + TRKDENSMAJ1000 + PointDe_NEI_PM_Popu_5000 + LURES5000 + DISTINVALL2"), sx)
+
+
+
+
+summary(HOA_lm)
+0.80 and adj 0.78
+
+plot(HOA_lm, which = 4)
+car::vif(HOA_lm)
+
+fold3_HOA <- cv.lm(HOA_lm$model, HOA_lm, m=3, legend.pos = "topright")
+
+cor(fold3_HOA$HOA, fold3_HOA$cvpred)**2
+0.76
+
+M_HOA<-rstudent(HOA_lm)
+mean(M_HOA)
+0.00206
+# root mean square of studentized
+sqrt(mean(M_HOA^2))
+1.02
+
+# HOA if only What Albert mentioned ---------------------------------------
+unwanted_HOA <- names(dplyr::select(LUR_input_f, contains('LUAGRI')))
+unwanted_HOA1 <- names(dplyr::select(LUR_input_f, contains('PointDe_NEI_PM_Popu')))
+unwanted_HOA2 <- names(dplyr::select(LUR_input_f, contains('Idw_PM_1')))
+unwanted_HOA3 <- names(dplyr::select(LUR_input_f, contains('PointDe_NEI')))
+unwanted_HOA4 <- names(dplyr::select(LUR_input_f, contains('Allo_Dist2')))
+unwanted_HOA5 <- names(dplyr::select(LUR_input_f, contains('Idw')))
+unwanted_HOA6 <- names(dplyr::select(LUR_input_f, contains('Allo')))
+unwanted_HOA7 <- names(dplyr::select(LUR_input_f, contains('LURES')))
+HOA_unwanted <- c(unwanted, unwanted_HOA, unwanted_HOA1, unwanted_HOA2, unwanted_HOA3, unwanted_HOA4, unwanted_HOA5, unwanted_HOA6, unwanted_HOA7)
+HOA <- make_lur(dat1 = LUR_input_f, response = "HOA", exclude = HOA_unwanted, dep_col = 262)
+
+HOA_lm <- lm(formula("HOA ~  + TRKDENALL100 + TRKDENSMAJ1000 + DISTINVALL2 + LURES5000 + ALLDIESAADT"), sx)
+summary(HOA_lm)
+
+# r2 portion
+library(relaimpo)
+calc.relimp(HOA_lm, type="lmg") 
+
+test <- lm(formula("HOA ~  + TRKDENALL100 + TRKDENSMAJ1000 + DISTINVALL2 "), sx)
+test2 <- lm(formula("HOA ~  + TRKDENALL100 + TRKDENSMAJ1000 + DISTINVALL2 + LURES5000 "), sx)
+summary(test)
+summary(test2)
+
+
+summary(HOA_lm)
+plot(HOA_lm, which = 4)
+car::vif(HOA_lm)
+fold3_HOA <- cv.lm(HOA_lm$model, HOA_lm, m=3, legend.pos = "topright")
+cor(fold3_HOA$HOA, fold3_HOA$cvpred)**2
+M_HOA<-rstudent(HOA_lm)
+mean(M_HOA)
+# root mean square of studentized
+sqrt(mean(M_HOA^2))
 
 
 # chi ---------------------------------------------------------------------
