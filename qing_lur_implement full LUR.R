@@ -10,7 +10,7 @@ library(car)
 library(ape)
 library(DAAG)
 
-LUR_input <- read_csv("LUR_input.csv")
+LUR_input <- read_csv("LUR_input.csv") # here chi is the right chi!
 LUR_input_01 <- LUR_input %>% select(-ID) 
 LUR_input_02 = LUR_input_01[!duplicated(lapply(LUR_input_01, summary))]
 zero_filter = LUR_input_02 %>% map_dbl(~sum(.x == 0)/nrow(LUR_input_02))

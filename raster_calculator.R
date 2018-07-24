@@ -51,6 +51,13 @@ write_csv(box_200_01, 'qing_final_box_200_to_plot_before_changing_extremes.csv')
 # limiting max and min values
 # not done yet
 box_200_02 <- box_200_01
-box_200_02 <- box_200_02 %>% mutate(hoa_full = if_else(hoa_full < 200, 200, hoa_full), hoa_full = if_else(hoa_full > 5114, 5114, hoa_full)) %>% mutate(coa_pub = if_else(coa_pub < 0, 0, coa_pub), coa_pub = if_else(coa_pub > 3826, 3826, coa_pub)) %>% mutate(mixing_state_pub = if_else(mixing_state_pub < 0.289, 0.289, mixing_state_pub), mixing_state_pub = if_else(mixing_state_pub > 0.704, 0.704, mixing_state_pub)) 
-  
+box_200_02 <- box_200_02 %>% dplyr::select(PageNumber, lat, longitude, coa_full:mixing_state_pub) %>% mutate(hoa_full = if_else(hoa_full < 200, 200, hoa_full), hoa_full = if_else(hoa_full > 5114, 5114, hoa_full)) %>% mutate(hoa_source = if_else(hoa_source < 200, 200, hoa_source), hoa_source = if_else(hoa_source > 5114, 5114, hoa_source)) %>% mutate(coa_full = if_else(coa_full < 0, 0, coa_full), coa_full = if_else(coa_full > 3826, 3826, coa_full)) %>% mutate(coa_source = if_else(coa_source < 0, 0, coa_source), coa_source = if_else(coa_source > 3826, 3826, coa_source)) %>% mutate(coa_solo_rest = if_else(coa_solo_rest < 0, 0, coa_solo_rest), coa_solo_rest = if_else(coa_solo_rest > 3826, 3826, coa_solo_rest)) %>% mutate(mixing_state_pub = if_else(mixing_state_pub < 0.296, 0.296, mixing_state_pub), mixing_state_pub = if_else(mixing_state_pub > 0.711, 0.711, mixing_state_pub)) 
+
+summary(LUR_input_f$chi) # 1 minux
+#Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#0.296   0.460   0.544   0.517   0.586   0.711 
+summary(LUR_input$chi) # the original chi
+#Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#0.289   0.414   0.456   0.483   0.540   0.704 
+
 write_csv(box_200_02, 'qing_final_box_200_to_plot.csv')
