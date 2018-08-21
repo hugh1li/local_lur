@@ -1,6 +1,5 @@
 # you need to use the ACS block group area as denominator
 
-
 library(tidyverse)
 library(googlesheets)
 
