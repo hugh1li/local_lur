@@ -81,6 +81,8 @@ mean(abs(COA_lm_full$residuals))
 COA_unwanted <- 'Elevation'
 COA_source <- make_lur(dat1 = LUR_input_f, response = "COA", dep_col = 262, exclude =  COA_unwanted)
 
+# COA_source here also means no elevation... COZ coa full and coa source the same
+
 COA_lm_source <- lm(formula("COA ~  + PointDe_Rest_100meters + LUCOMM1000"), sx)
 
 summary(COA_lm_source)

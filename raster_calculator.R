@@ -1,3 +1,5 @@
+# this one you only extract several covariates
+
 # you need all boxes coz you need prediction in some large 1km2 box (outside city)
 
 # after 200m centroid extraction
