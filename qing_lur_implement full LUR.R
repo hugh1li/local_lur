@@ -46,12 +46,14 @@ unwanted <- c(unwanted1, unwanted2, unwanted3, unwanted4, unwanted5_01, unwanted
 
 # COA full ---------------------------------------------------------------------
 # not 298, coz duplicates removal code change order already
-COA_full <- make_lur(dat1 = LUR_input_f, response = "COA", dep_col = 262)
+COA_unwanted <- c(unwanted, 'PointDe_NEI_PM_1000', 'PointDe_NEI_1000')
+COA_full <- make_lur(dat1 = LUR_input_f, response = "COA", dep_col = 262, exclude = COA_unwanted)
+
+COA_full$formula
 
 # validation 
-COA_lm_full <- lm(formula("COA ~  + PointDe_Rest_100meters + Elevation"), sx)
+COA_lm_full <- lm(formula("COA ~  + PointDe_Rest_100meters + EucDistinv_PM + POPDEN1000 + RDMAJ1000"), sx)
 
-# adj 0.68
 plot(COA_lm_full, which = 4)
 car::vif(COA_lm_full)
 
@@ -136,15 +138,18 @@ rmse(COA_solo$model$COA, COA_solo$fitted.values)
 mean(abs(COA_solo$residuals))
 500
 
-# HOA full use 5---------------------------------------------------------------------
+# HOA full use all---------------------------------------------------------------------
 # HOA <- make_lur(dat1 = LUR_input_f, response = "HOA", dep_col = 288)
-HOA_full <- make_lur(dat1 = LUR_input_f, response = "HOA", exclude = unwanted, dep_col = 262)
+unwanted
+HOA_unwanted <- c(unwanted, 'PointDe_NEI_PM_Popu_30000') # I really don't think the 30k var should be inside...
+
+HOA_full <- make_lur(dat1 = LUR_input_f, response = "HOA", exclude = HOA_unwanted, dep_col = 262)
 # validation 
 
-HOA_lm_full <- lm(formula("HOA ~  + TRKDENALL100 + LUAGRI500 + EucDistinv_PM + LUINDUS5000 + ALLDIESAADT_DIS2"), sx)
+HOA_lm <- lm(formula("HOA ~  + VEHDENALL100 + LUUtTr5000"), sx)
 
 summary(HOA_lm)
-0.77, adj 0.75
+0.60, adj 0.58
 
 plot(HOA_lm, which = 4)
 car::vif(HOA_lm)
@@ -153,27 +158,28 @@ car::vif(HOA_lm)
 # todo
 
 # LOOCV R2
-loocv_HOA <- cv.lm(HOA_lm_full$model, HOA_lm_full, m=72, legend.pos = "topright")
+HOA_lm_full <- HOA_lm
+loocv_HOA <- cv.lm(HOA_lm_full$model, HOA_lm_full, m=64, legend.pos = "topright")
 cor(loocv_HOA$HOA,loocv_HOA$cvpred)**2
-
+0.54
 
 # 3 fold
 fold3_HOA <- cv.lm(HOA_lm_full$model, HOA_lm_full, m=3, legend.pos = "topright")
 cor(fold3_HOA$HOA, fold3_HOA$cvpred)**2
-0.75
+0.47
 
 # 10 fold
 fold10_HOA <- cv.lm(HOA_lm_full$model, HOA_lm_full, m=10, legend.pos = "topright")
 cor(fold10_HOA$HOA, fold3_HOA$cvpred)**2
-0.75
+
 
 # mean studentized prediction residuals (sd used n-1)
 M_HOA<-rstudent(HOA_lm_full)
 mean(M_HOA)
-0.00168
+
 # root mean square of studentized
 sqrt(mean(M_HOA^2))
-1
+
 
 # different R2
 library(relaimpo)
@@ -181,9 +187,9 @@ calc.relimp(HOA_lm_full, type="lmg")
 
 # RMSE and MAE
 rmse(HOA_lm_full$model$HOA, HOA_lm_full$fitted.values)
-355
+
 mean(abs(HOA_lm_full$residuals))
-277
+
 
 
 # # calculate correlation of these vars
@@ -194,15 +200,15 @@ mean(abs(HOA_lm_full$residuals))
 
 # nope HOA source specific -----------------------------------------------------
 unwanted_HOA <- names(dplyr::select(LUR_input_f, contains('LUAGRI')))
-HOA_unwanted <- c(unwanted, unwanted_HOA)
+HOA_unwanted <- c(unwanted, unwanted_HOA, 'PointDe_NEI_PM_Popu_30000', 'LUUtTr5000', 'PointDe_NEI_PM_Popu_15000', 'PointDe_NEI_30000', 'PointDe_NEI_PM_7500', 'PointDe_NEI_PM_30000', 'PointDe_NEI_7500', 'HOUSDEN100')
 HOA_source <- make_lur(dat1 = LUR_input_f, response = "HOA", exclude = HOA_unwanted, dep_col = 262)
-HOA_lm <- lm(formula( "HOA ~  + TRKDENALL100 + TRKDENSMAJ1000 + PointDe_NEI_PM_Popu_5000 + LURES5000 + DISTINVALL2"), sx)
 
+HOA_source$formula
 
-
+HOA_lm <- lm(formula("HOA ~  + VEHDENALL100 + ALLDIESAADT_DIS2 "), sx)
 
 summary(HOA_lm)
-0.80 and adj 0.78
+
 
 plot(HOA_lm, which = 4)
 car::vif(HOA_lm)
@@ -210,16 +216,20 @@ car::vif(HOA_lm)
 fold3_HOA <- cv.lm(HOA_lm$model, HOA_lm, m=3, legend.pos = "topright")
 
 cor(fold3_HOA$HOA, fold3_HOA$cvpred)**2
-0.76
 
 M_HOA<-rstudent(HOA_lm)
 mean(M_HOA)
-0.00206
+
 # root mean square of studentized
 sqrt(mean(M_HOA^2))
-1.02
 
-# HOA if only What Albert mentioned ---------------------------------------
+# loocv
+loocv_HOA <- cv.lm(HOA_lm_source$model, HOA_lm_source, m=64, legend.pos = "topright")
+cor(loocv_HOA$HOA,loocv_HOA$cvpred)**2
+
+
+
+# replaced by upper: HOA if only What Albert mentioned ---------------------------------------
 unwanted_HOA <- names(dplyr::select(LUR_input_f, contains('LUAGRI')))
 unwanted_HOA1 <- names(dplyr::select(LUR_input_f, contains('PointDe_NEI_PM_Popu')))
 unwanted_HOA2 <- names(dplyr::select(LUR_input_f, contains('Idw_PM_1')))
@@ -228,13 +238,15 @@ unwanted_HOA4 <- names(dplyr::select(LUR_input_f, contains('Allo_Dist2')))
 unwanted_HOA5 <- names(dplyr::select(LUR_input_f, contains('Idw')))
 unwanted_HOA6 <- names(dplyr::select(LUR_input_f, contains('Allo')))
 unwanted_HOA7 <- names(dplyr::select(LUR_input_f, contains('LURES')))
-HOA_unwanted <- c(unwanted, unwanted_HOA, unwanted_HOA1, unwanted_HOA2, unwanted_HOA3, unwanted_HOA4, unwanted_HOA5, unwanted_HOA6, unwanted_HOA7)
-HOA_source <- make_lur(dat1 = LUR_input_f, response = "HOA", exclude = HOA_unwanted, dep_col = 262)
+# HOA_unwanted <- c(unwanted, unwanted_HOA, unwanted_HOA1, unwanted_HOA2, unwanted_HOA3, unwanted_HOA4, unwanted_HOA5, unwanted_HOA6, unwanted_HOA7)
+# HOA_source <- make_lur(dat1 = LUR_input_f, response = "HOA", exclude = HOA_unwanted, dep_col = 262)
+# 
+# HOA_lm_source <- lm(formula("HOA ~  + TRKDENALL100 + TRKDENSMAJ1000 + DISTINVALL2"), sx)
 
-HOA_lm_source <- lm(formula("HOA ~  + TRKDENALL100 + TRKDENSMAJ1000 + DISTINVALL2"), sx)
+HOA_lm_source  <- lm(formula("HOA ~  + VEHDENALL100 + ALLDIESAADT_DIS2 "), sx)
+
 
 summary(HOA_lm_source)
-0.73 or 0.72
 
 # r2 portion
 library(relaimpo)
@@ -245,7 +257,7 @@ plot(HOA_lm_source, which = 4)
 car::vif(HOA_lm_source)
 fold3_HOA <- cv.lm(HOA_lm_source$model, HOA_lm_source, m=3, legend.pos = "topright")
 cor(fold3_HOA$HOA, fold3_HOA$cvpred)**2
-0.70
+
 M_HOA<-rstudent(HOA_lm_source)
 mean(M_HOA)
 # root mean square of studentized
@@ -254,9 +266,9 @@ sqrt(mean(M_HOA^2))
 
 # RMSE and MAE
 rmse(HOA_lm_source$model$HOA, HOA_lm_source$fitted.values)
-385
+
 mean(abs(HOA_lm_source$residuals))
-309
+
 
 
 
