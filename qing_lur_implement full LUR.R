@@ -1,3 +1,6 @@
+# note 
+# don't trust any numbers in this file
+
 library(Metrics)
 library(readxl)
 # dep_col in LUR function  
@@ -50,7 +53,7 @@ COA_unwanted <- c(unwanted, 'PointDe_NEI_PM_1000', 'PointDe_NEI_1000')
 COA_full <- make_lur(dat1 = LUR_input_f, response = "COA", dep_col = 262, exclude = COA_unwanted)
 
 COA_full$formula
-
+COA_full$summary
 # validation 
 COA_lm_full <- lm(formula("COA ~  + PointDe_Rest_100meters + EucDistinv_PM + POPDEN1000 + RDMAJ1000"), sx)
 
@@ -61,18 +64,17 @@ car::vif(COA_lm_full)
 # todo
 
 # LOOCV R2
-loocv_COA <- cv.lm(COA_lm_full$model, COA_lm_full, m=72, legend.pos = "topright")
+loocv_COA <- cv.lm(COA_lm_full$model, COA_lm_full, m=64, legend.pos = "topright")
 cor(loocv_COA$COA,loocv_COA$cvpred)**2
-0.67
+
 
 # 3 fold valdation
 fold3_COA <- cv.lm(COA_lm_full$model, COA_lm_full, m=3, legend.pos = "topright")
 cor(fold3_COA$COA, fold3_COA$cvpred)**2
-0.63
+
 # 10 fold
 fold10_COA <- cv.lm(COA_lm_full$model, COA_lm_full, m=10, legend.pos = "topright")
 cor(fold10_COA$COA, fold10_COA$cvpred)**2
-0.67
 
 
 # mean studentized prediction residuals (sd used n-1)
@@ -85,9 +87,9 @@ sqrt(mean(M_COA^2))
 
 # RMSE and MAE
 rmse(COA_lm_full$model$COA, COA_lm_full$fitted.values)
-587
+
 mean(abs(COA_lm_full$residuals))
-468
+
 
 
 # COA no elevation -----------------------------------------------------
