@@ -1,3 +1,4 @@
 1. need the table
 2. The map
 3. The 200m prediction for her to get CDFs
+4. Basemap (coz several cells deleted)
