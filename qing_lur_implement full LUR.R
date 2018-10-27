@@ -1,5 +1,5 @@
 library(Metrics)
-
+library(readxl)
 # dep_col in LUR function  
 # not 298, coz duplicates removal code change order already
 
@@ -11,7 +11,15 @@ library(ape)
 library(DAAG)
 
 LUR_input <- read_csv("LUR_input.csv") # here chi is the right chi!
-LUR_input_01 <- LUR_input %>% select(-ID) 
+
+chi_new_dep <- read_excel('revised input 10252018/new_dep.xlsx', sheet = 1) %>% rename(ID = Cell_ID) %>% select(-"1 - chi")
+
+OA_new_dep <- read_excel('revised input 10252018/new_dep.xlsx', sheet = 2) %>% rename(ID = '200cell id')
+
+new_LUR_input <- LUR_input %>% select(-HOA, -COA, -chi) %>% left_join(OA_new_dep) %>% left_join(chi_new_dep)
+
+  
+LUR_input_01 <- new_LUR_input %>% select(-ID) 
 LUR_input_02 = LUR_input_01[!duplicated(lapply(LUR_input_01, summary))]
 zero_filter = LUR_input_02 %>% map_dbl(~sum(.x == 0)/nrow(LUR_input_02))
 filter_25  = LUR_input_02 %>% map_dbl(~sum(.x == 25)/nrow(LUR_input_02))
