@@ -15,15 +15,15 @@ library(DAAG)
 
 LUR_input <- read_csv("LUR_input.csv") # here chi is the right chi!
 
-chi_new_dep <- read_excel('revised input 10252018/new_dep.xlsx', sheet = 1) %>% rename(ID = Cell_ID) %>% select(-"1 - chi")
+chi_new_dep <- read_excel('revised input 10252018/new_dep.xlsx', sheet = 1) %>% rename(ID = Cell_ID) %>% dplyr::select(-"1 - chi")
 
 OA_new_dep <- read_excel('revised input 10252018/new_dep.xlsx', sheet = 2) %>% rename(ID = '200cell id')
 
-OA_LUR_input <- LUR_input %>% select(-HOA, -COA, -chi) %>% inner_join(OA_new_dep)
+OA_LUR_input <- LUR_input %>% dplyr::select(-HOA, -COA, -chi) %>% inner_join(OA_new_dep)
 
-chi_LUR_input <- LUR_input %>% select(-HOA, -COA, -chi) %>% inner_join(chi_new_dep)
+chi_LUR_input <- LUR_input %>% dplyr::select(-HOA, -COA, -chi) %>% inner_join(chi_new_dep)
   
-LUR_input_01 <- OA_LUR_input %>% select(-ID)
+LUR_input_01 <- OA_LUR_input %>% dplyr::select(-ID)
 
 LUR_input_02 = LUR_input_01[!duplicated(lapply(LUR_input_01, summary))]
 zero_filter = LUR_input_02 %>% map_dbl(~sum(.x == 0)/nrow(LUR_input_02))
@@ -60,6 +60,8 @@ COA_lm_full <- lm(formula("COA ~  + PointDe_Rest_100meters + EucDistinv_PM + POP
 plot(COA_lm_full, which = 4)
 car::vif(COA_lm_full)
 
+library(relaimpo)
+calc.relimp(COA_lm_full, type="lmg") 
 # moran's I
 # todo
 
@@ -91,6 +93,14 @@ rmse(COA_lm_full$model$COA, COA_lm_full$fitted.values)
 mean(abs(COA_lm_full$residuals))
 
 
+# COA source specifc ------------------------------------------------------
+COA_unwanted <- c(unwanted, 'PointDe_NEI_PM_1000', 'PointDe_NEI_1000', 'EucDistinv_PM', 'EucDistinv2_PM')
+
+# then steal the upper one for more stats
+COA_lm_source <- lm(formula("COA ~  + PointDe_Rest_100meters + RDMAJ1000 + POPDEN1000"), sx)
+# partial r2 
+
+calc.relimp(COA_lm_source, type="lmg")
 
 # COA no elevation -----------------------------------------------------
 COA_unwanted <- 'Elevation'
@@ -126,6 +136,7 @@ rmse(COA_lm_source$model$COA, COA_lm_source$fitted.values)
 587
 mean(abs(COA_lm_source$residuals))
 474
+
 
 
 # COA just restaurant density ---------------------------------------------
