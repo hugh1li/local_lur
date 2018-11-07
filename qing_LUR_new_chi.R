@@ -24,7 +24,7 @@ unwanted6 <- names(dplyr::select(LUR_input_f, contains('Ni')))
 
 unwanted <- c(unwanted1, unwanted2, unwanted3, unwanted4, unwanted5_01, unwanted6)
 
-# chi ---------------------------------------------------------------------
+# chi before go home---------------------------------------------------------------------
 
 # wait, if we delete LUINDUS first
 # answer: doesn't change much
@@ -78,3 +78,12 @@ mean(abs(chi_lm$residuals))
 # partial r2
 library(relaimpo)
 calc.relimp(chi_lm, type="lmg") 
+
+
+# chi 12/02 highway train -------------------------------------------------------
+chi_unwanted <- c(unwanted, 'HOUSDEN300', 'HOUSDEN500', 'HOUSDEN100' , 'LURES300', 'LURES100', 'LURES500', 'PointDe_NEI_PM_Popu_30000', 'LURES1000', 'PointDe_NEI_30000', 'PointDe_NEI_PM_Popu_7500', 'PointDe_NEI_PM_Popu_15000','POPDEN1000','PointDe_NEI_PM_20000', 'PointDe_NEI_PM_30000', 'PointDe_NEI_PM_15000', 'PointDe_NEI_20000', 'PointDe_NEI_PM_10000', 'PointDe_NEI_15000',  'HOUSDEN1000', 'PointDe_NEI_10000', 'PointDe_NEI_PM_7500', 'POPDEN500', 'PointDe_NEI_7500')
+chi <- make_lur(dat1 = LUR_input_f, response = "chi", dep_col = 262, exclude = chi_unwanted) 
+chi$formula
+chi$summary
+
+
