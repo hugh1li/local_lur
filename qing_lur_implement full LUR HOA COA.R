@@ -15,7 +15,7 @@ library(DAAG)
 
 LUR_input <- read_csv("LUR_input.csv") # here chi is the right chi! (but I remove and join other chi anyway...)
 
-chi_new_dep <- read_excel('revised input 10252018/new_dep.xlsx', sheet = 1) %>% rename(ID = Cell_ID) %>% dplyr::select(-"1 - chi")
+chi_new_dep <- read_excel('revised input 10252018/new_dep.xlsx', sheet = 1) %>% rename(ID = Cell_ID) %>% dplyr::select(-"1 - chi") # here i removed the 1-chi column
 
 OA_new_dep <- read_excel('revised input 10252018/new_dep.xlsx', sheet = 2) %>% rename(ID = '200cell id')
 
