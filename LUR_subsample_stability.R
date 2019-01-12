@@ -84,3 +84,39 @@ summary(check)
 plot(check, which = 4)
 car::vif(check)
 
+
+
+# HOA--------
+# HOA_unwanted change slightly than the original paper 
+# i don't trust these 30k buffer variables
+HOA_unwanted <- c(unwanted, 'PointDe_NEI_PM_Popu_30000', 'PointDe_NEI_PM_Popu_15000', 'PointDe_NEI_30000', 'PointDe_NEI_7500', 'PointDe_NEI_PM_30000') # I really 
+
+HOA_models <- LUR_full_set(source_data = LUR_input_f, n_rows = 42, dep_col = 262, response = 'HOA', exclude = HOA_unwanted)
+
+check <- lm(formula(), HOA_models$data)
+summary(check)
+plot(check, which = 4)
+car::vif(check)
+
+# sim1
+check <- lm(formula("HOA ~  + RDMAJ100 + DISTINVALL2 + TRKDENALL300 + LURES100 "), HOA_models$data)
+summary(check)
+plot(check, which = 4)
+car::vif(check)
+
+# sim2 
+check <- lm(formula("HOA ~  + VEHDENALL100 + PointDe_Rest_300meters + ALLDIESAADT_DIS2 "), HOA_models$data)
+summary(check)
+plot(check, which = 4)
+car::vif(check)
+
+# sim10
+check <- lm(formula("HOA ~  + VEHDENMAJ100 + LUUtTr5000 "), HOA_models$data)
+summary(check)
+plot(check, which = 4)
+car::vif(check)
+
+
+# mixing state ------------------------------------------------------------
+
+
