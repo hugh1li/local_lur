@@ -73,3 +73,13 @@ summary(check)
 plot(check, which = 4)
 car::vif(check)
 
+
+# choose no.1 to draw -----------------------------------------------------
+check <- lm(formula( "chi ~  + PointDe_Rest_1000meters + POPDEN1000 + LUVaFo500"), sx)
+summary(check)
+# the formula
+3.981039e-01 + 2.805095e-03 * PointDe_Rest_1000meters + 5.341151e-06 *  POPDEN1000 
+- 5.735680e-08  * LUVaFo500 
+
+
+ 
