@@ -26,7 +26,7 @@ box_200 <- final
 # calculate COA hoa and mixing state ----
 
 box_200_01 <- box_200 %>% mutate(coa_full = -734 + 11.3 * PointDe_Rest_100meters + 2.03e5 * EucDistinv_PM + 0.148 * POPDEN1000 + 3.61e-2 *RDMAJ1000
-, coa_source = -717.793 + 12.8734 * PointDe_Rest_100meters + 0.0505 * RDMAJ1000 + 0.1633 * POPDEN1000,  hoa_full = -543 + 25 * VEHDENALL100 + 1.49e-3 * LUUtTr5000, hoa_source = 1577.24 + 21.48 * VEHDENALL100 + 321.5 * ALLDIESAADT_DIS2 , mixing_state_oppo = -0.304 + 5.77e-6*RDMAJ1000 + HOUSDEN300 * 7.59e-5 + 9.44 * PointDe_NEI_30000) 
+, coa_source = -717.793 + 12.8734 * PointDe_Rest_100meters + 0.0505 * RDMAJ1000 + 0.1633 * POPDEN1000,  hoa_full = -543 + 25 * VEHDENALL100 + 1.49e-3 * LUUtTr5000, hoa_source = 1577.24 + 21.48 * VEHDENALL100 + 321.5 * ALLDIESAADT_DIS2 , mixing_state_oppo = -0.304 + 5.77e-6*RDMAJ1000 + HOUSDEN300 * 7.59e-5 + 9.44 * PointDe_NEI_30000)
 
 
 # compare with qing's value
@@ -44,7 +44,8 @@ write_csv(box_200_01_f, 'qing_102718new-prediction.csv')
 
 # 011419 1-chi prediction -------------------------------------------------
 # start from box_200 <- final
-box_200_011419 <- box_200 %>% mutate(OneMinusChi = 3.981039e-01 + 2.805095e-03 * PointDe_Rest_1000meters + 5.341151e-06 *  POPDEN1000 - 5.735680e-08*LUVaFo500)
+box_200_011419 <- box_200 %>% mutate(OneMinusChi = 3.981039e-01 + 2.805095e-03 * PointDe_Rest_1000meters + 5.341151e-06 *  POPDEN1000 + 5.735680e-08*LUVaFo500) # Did i need negative sign here?
+
 box_200_011419 %>% dplyr::select(Polygon200ID, long, lat, OneMinusChi) %>% write_csv('qing_011419_OneMinusChi.csv')
 
 summary(box_200_011419$OneMinusChi)
