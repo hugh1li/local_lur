@@ -32,6 +32,8 @@ zero_filter = LUR_input_02 %>% map_dbl(~sum(.x == 0)/nrow(LUR_input_02))
 filter_25  = LUR_input_02 %>% map_dbl(~sum(.x == 25)/nrow(LUR_input_02))
 LUR_input_f = LUR_input_02[zero_filter < 0.5 & filter_25 < 0.5]
 
+sx <- LUR_input_f
+
 # LUR_input_f = LUR_input_f %>% mutate(chi = 1 - chi) # changing to 1 minus here
 
 ignore_list <- names(LUR_input_f)[1:262]
@@ -86,6 +88,16 @@ car::vif(check)
 
 
 
+
+# COA partial R2 ----------------------------------------------------------
+
+check <- lm(formula( "COA ~  + PointDe_Rest_100meters + PointDe_NEI_PM_1500 + EucDistinv_PM + PointDe_NEI_PM_Popu_15000"), sx)
+summary(check)
+library(relaimpo)
+calc.relimp(check, type="lmg", rela = TRUE)
+
+
+
 # HOA--------
 # HOA_unwanted change slightly than the original paper 
 # i don't trust these 30k buffer variables
@@ -115,6 +127,13 @@ check <- lm(formula("HOA ~  + VEHDENMAJ100 + LUUtTr5000 "), HOA_models$data)
 summary(check)
 plot(check, which = 4)
 car::vif(check)
+
+# HOA partial R2 ----------------------------------------------------------
+check <- lm(formula("HOA ~  + VEHDENMAJ100 + LUUtTr5000 "), sx)
+summary(check)
+library(relaimpo)
+calc.relimp(check, type="lmg", rela = TRUE)
+
 
 
 
