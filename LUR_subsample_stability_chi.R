@@ -82,4 +82,11 @@ summary(check)
 + 5.735680e-08  * LUVaFo500 # note here you don't need to put negative sign in LuVaFo500
 
 
+# mixing state partial R2 -------------------------------------------------
+
+check <- lm(formula(  "chi ~  + RDMAJ1000 + PointDe_NEI_PM_Popu_15000 + PointDe_Rest_500meters + LURES100"), sx)
+summary(check)
+library(relaimpo)
+calc.relimp(check, type="lmg", rela = TRUE)
+
  
