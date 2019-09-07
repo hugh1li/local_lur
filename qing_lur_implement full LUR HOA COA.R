@@ -1,5 +1,5 @@
 # note 
-# don't trust any numbers in this file
+# don't trust any numbers in this file (coz uncertainty and no prompt update)
 
 library(Metrics)
 library(readxl)
@@ -96,35 +96,51 @@ mean(abs(COA_lm_full$residuals))
 # COA source specifc ------------------------------------------------------
 COA_unwanted <- c(unwanted, 'PointDe_NEI_PM_1000', 'PointDe_NEI_1000', 'EucDistinv_PM', 'EucDistinv2_PM')
 
-# then steal the upper one for more stats
+# then steal the upper one for more stats (basically you turn back and run the script above....)
 COA_lm_source <- lm(formula("COA ~  + PointDe_Rest_100meters + RDMAJ1000 + POPDEN1000"), sx)
 # partial r2 
 
+
 calc.relimp(COA_lm_source, type="lmg")
+
+# 3 fold r2
+
+# 10 fold r2..
+fold10_COA <- cv.lm(COA_lm_source$model, COA_lm_source, m=10, legend.pos = "topright")
+cor(fold10_COA$COA, fold10_COA$cvpred)**2
+
+
 
 # COA no elevation -----------------------------------------------------
 COA_unwanted <- 'Elevation'
 COA_source <- make_lur(dat1 = LUR_input_f, response = "COA", dep_col = 262, exclude =  COA_unwanted)
 
-# COA_source here also means no elevation... COZ coa full and coa source the same
+# COA_source here also means no elevation... COZ coa full and coa source the same 
+# Line above so confusing...
 
-COA_lm_source <- lm(formula("COA ~  + PointDe_Rest_100meters + LUCOMM1000"), sx)
 
-summary(COA_lm_source)
-0.69, adj 0.68
-plot(COA_lm_source, which = 4)
-car::vif(COA_lm_source)
+COA_lm_source_no_elevation <- lm(formula("COA ~  + PointDe_Rest_100meters + LUCOMM1000"), sx)
+
+summary(COA_lm_source_no_elevation)
+
+plot(COA_lm_source_no_elevation, which = 4)
+car::vif(COA_lm_source_no_elevation)
 
 # moran's I
 # todo
 
 # 3 fold valdation
-fold3_COA <- cv.lm(COA_lm_source$model, COA_lm_source, m=3, legend.pos = "topright")
+fold3_COA <- cv.lm(COA_lm_source_no_elevation$model, COA_lm_source_no_elevation, m=3, legend.pos = "topright")
 cor(fold3_COA$COA, fold3_COA$cvpred)**2
-0.63
+# 0.63 (I run it again in 09/06/19, found 0.61, same value qing writes in paper. Well, COA source specific and COA no elevation not the same....)
+# well, I found the mistake here. coz the COA no elevation, COA source specfic are two models. But you mixed them two in this section and above.
+
+fold10_COA <- cv.lm(COA_lm_source_no_elevation$model, COA_lm_source_no_elevation, m=10, legend.pos = "topright")
+cor(fold10_COA$COA, fold10_COA$cvpred)**2
+0.54
 
 # mean studentized prediction residuals (sd used n-1)
-M_COA <-rstudent(COA_lm_source)
+M_COA <-rstudent(COA_lm_source_no_elevation)
 mean(M_COA)
 0.00317
 
@@ -132,10 +148,10 @@ mean(M_COA)
 sqrt(mean(M_COA^2))
 
 # RMSE and MAE
-rmse(COA_lm_source$model$COA, COA_lm_source$fitted.values)
-587
-mean(abs(COA_lm_source$residuals))
-474
+rmse(COA_lm_source_no_elevation$model$COA, COA_lm_source_no_elevation$fitted.values)
+
+mean(abs(COA_lm_source_no_elevation$residuals))
+
 
 
 
@@ -183,7 +199,7 @@ cor(fold3_HOA$HOA, fold3_HOA$cvpred)**2
 
 # 10 fold
 fold10_HOA <- cv.lm(HOA_lm_full$model, HOA_lm_full, m=10, legend.pos = "topright")
-cor(fold10_HOA$HOA, fold3_HOA$cvpred)**2
+cor(fold10_HOA$HOA, fold10_HOA$cvpred)**2
 
 
 # mean studentized prediction residuals (sd used n-1)
@@ -228,6 +244,7 @@ car::vif(HOA_lm)
 
 fold3_HOA <- cv.lm(HOA_lm$model, HOA_lm, m=3, legend.pos = "topright")
 
+
 cor(fold3_HOA$HOA, fold3_HOA$cvpred)**2
 
 M_HOA<-rstudent(HOA_lm)
@@ -270,6 +287,10 @@ plot(HOA_lm_source, which = 4)
 car::vif(HOA_lm_source)
 fold3_HOA <- cv.lm(HOA_lm_source$model, HOA_lm_source, m=3, legend.pos = "topright")
 cor(fold3_HOA$HOA, fold3_HOA$cvpred)**2
+
+fold10_HOA <- cv.lm(HOA_lm_source$model, HOA_lm_source, m=10, legend.pos = "topright")
+cor(fold10_HOA$HOA, fold10_HOA$cvpred)**2
+
 
 M_HOA<-rstudent(HOA_lm_source)
 mean(M_HOA)
