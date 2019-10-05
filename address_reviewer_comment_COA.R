@@ -16,17 +16,18 @@ library(car)
 library(ape)
 library(DAAG)
 
-LUR_input <- read_csv("LUR_input.csv")  # here chi is the right chi! (but I remove and join other chi anyway...)
+LUR_input <- read_csv("LUR_input.csv")  # here chi is the right chi! (but I remove and join other chi anyway...). But 10/05/2019 found this input not the one we used for final paper. It has 72 rows, but revised final chi input only 63, HOA/COA 65...
 
 chi_new_dep <- read_excel('revised input 10252018/new_dep.xlsx', sheet = 1) %>% rename(ID = Cell_ID) %>% dplyr::select(-"1 - chi") # here i removed the 1-chi column
 
 OA_new_dep <- read_excel('revised input 10252018/new_dep.xlsx', sheet = 2) %>% rename(ID = '200cell id') # OA_new_dep only 65 rows, but LUR_input has 72 rows
+# 10/05/2019 here "200cell" misleading, coz OA has both 200 and 1km2 id.
 
 OA_LUR_input <- LUR_input %>% dplyr::select(-HOA, -COA, -chi) %>% inner_join(OA_new_dep)
 
 chi_LUR_input <- LUR_input %>% dplyr::select(-HOA, -COA, -chi) %>% inner_join(chi_new_dep)
 
-LUR_input_01 <- OA_LUR_input %>% select(-ID)
+LUR_input_01 <- OA_LUR_input %>% dplyr::select(-ID)
 
 LUR_input_02 = LUR_input_01[!duplicated(lapply(LUR_input_01, summary))]
 zero_filter = LUR_input_02 %>% map_dbl(~sum(.x == 0)/nrow(LUR_input_02))
@@ -61,8 +62,9 @@ unwanted <- c(unwanted1, unwanted2, unwanted3, unwanted4, unwanted5_01, unwanted
 # COA only subdivided source specifc ------------------------------------------------------
 # COA_unwanted <- c(unwanted, 'PointDe_NEI_PM_1000', 'PointDe_NEI_1000', 'EucDistinv_PM', 'EucDistinv2_PM')
 COA_unwanted <- c(unwanted, 'PointDe_NEI_1000', 'LUAGRI5000', 'EucDistinv_PM', 'LUVaFo1000', 'LUVaFo500', 'EucDistinv2_PM', 'HOA')
+#* 10/06/19 My initial scan of the LUR code, I feel HOA should not be inside the final models...Well, i got it. -c(264:249), params command will delete all qualifying col indexes...
 
-COA_source <- make_lur(dat1 = LUR_input_f, response = "COA", dep_col = 262, exclude = COA_unwanted)
+COA_source <- make_lur(dat1 = LUR_input_f, response = "COA", dep_col = 262, exclude = COA_unwanted) #* 10/05/2019 during NM trip, I feel weird HOA can hop into the final LUR models...
 
 COA_source$formula
 COA_source$summary

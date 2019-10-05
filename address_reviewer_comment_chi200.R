@@ -1,3 +1,6 @@
+#* go to file "qing_LUR_new_chi.R"
+
+
 # rm all vars
 
 LUR_input_01 <- chi_LUR_input %>% dplyr::select(-ID)
@@ -11,6 +14,8 @@ LUR_input_f = LUR_input_f %>% mutate(chi = 1 - chi)
 
 ignore_list <- names(LUR_input_f)[1:262]
 
+ # remove the 1km2 boxes... (only for my reviewer comment)
+ LUR_input_f <- LUR_input_f %>% slice(11:62)
 
 sx <- LUR_input_f
 
@@ -23,9 +28,10 @@ unwanted5 <- names(dplyr::select(LUR_input_f, contains('Co')))
 unwanted5_01 <- unwanted5[unwanted5 %>% stringr::str_detect('COMM') == FALSE]
 unwanted6 <- names(dplyr::select(LUR_input_f, contains('Ni')))
 
-unwanted <- c(unwanted1, unwanted2, unwanted3, unwanted4, unwanted5_01, unwanted6)
+unwanted <- c(unwanted1, unwanted2, unwanted3, unwanted4, unwanted5_01, unwanted6, 'LUVaFo500', 'LUAGRI5000')
 
 # chi before go home---------------------------------------------------------------------
+#* the title is from previous "qing_LUR_new_chi.R"...
 
 # wait, if we delete LUINDUS first
 # answer: doesn't change much
@@ -34,10 +40,10 @@ chi <- make_lur(dat1 = LUR_input_f, response = "chi", dep_col = 262, exclude = u
 chi$formula
 chi$summary
 
-# validation 
-"chi ~  + RDMAJ1000 + HOUSDEN300 + PointDe_NEI_30000 + LURES100"
+# inital model output
+"chi ~  + RDMAJ1000 + HOUSDEN300 + PointDe_NEI_PM_Popu_15000 + Elevation + LURES1000 + POPDEN500 + LUINDUS300 + ALLDIESAADT"
 
-chi_lm <- lm(formula( "chi ~  + RDMAJ1000 + HOUSDEN300 + PointDe_NEI_30000"), sx)
+chi_lm <- lm(formula( "chi ~  + RDMAJ1000 + HOUSDEN300 + PointDe_NEI_PM_Popu_15000 "), sx)
 summary(chi_lm)
 
 plot(chi_lm, which = 4)
@@ -45,10 +51,6 @@ car::vif(chi_lm)
 
 # moran's I
 # todo
-
-# LOOCV R2
-loocv_chi <- cv.lm(chi_lm$model, chi_lm, m=62, legend.pos = "topright")
-cor(loocv_chi$chi,loocv_chi$cvpred)**2
 
 
 # 3 fold r2 
@@ -60,12 +62,12 @@ fold10_chi <- cv.lm(chi_lm$model, chi_lm, m=10, legend.pos = "topright")
 cor(fold10_chi$chi,fold10_chi$cvpred)**2
 
 
-# mean studentized prediction residuals (sd used n-1)
-M_chi <- rstudent(chi_lm)
-mean(M_chi)
-
-# root mean square of studentized
-sqrt(mean(M_chi^2))
+# # mean studentized prediction residuals (sd used n-1)
+# M_chi <- rstudent(chi_lm)
+# mean(M_chi)
+# 
+# # root mean square of studentized
+# sqrt(mean(M_chi^2))
 
 
 
@@ -81,10 +83,6 @@ library(relaimpo)
 calc.relimp(chi_lm, type="lmg") 
 
 
-# chi 12/02 highway train -------------------------------------------------------
-chi_unwanted <- c(unwanted, 'HOUSDEN300', 'HOUSDEN500', 'HOUSDEN100' , 'LURES300', 'LURES100', 'LURES500', 'PointDe_NEI_PM_Popu_30000', 'LURES1000', 'PointDe_NEI_30000', 'PointDe_NEI_PM_Popu_7500', 'PointDe_NEI_PM_Popu_15000','POPDEN1000','PointDe_NEI_PM_20000', 'PointDe_NEI_PM_30000', 'PointDe_NEI_PM_15000', 'PointDe_NEI_20000', 'PointDe_NEI_PM_10000', 'PointDe_NEI_15000',  'HOUSDEN1000', 'PointDe_NEI_10000', 'PointDe_NEI_PM_7500', 'POPDEN500', 'PointDe_NEI_7500')
-chi <- make_lur(dat1 = LUR_input_f, response = "chi", dep_col = 262, exclude = chi_unwanted) 
-chi$formula
-chi$summary
+
 
 
