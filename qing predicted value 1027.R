@@ -49,3 +49,31 @@ box_200_011419 <- box_200 %>% mutate(OneMinusChi = 3.981039e-01 + 2.805095e-03 *
 box_200_011419 %>% dplyr::select(Polygon200ID, long, lat, OneMinusChi) %>% write_csv('qing_011419_OneMinusChi.csv')
 
 summary(box_200_011419$OneMinusChi)
+
+
+# response to reviewer PNC source model -----------------------------------
+box_200_10092019 <- box_200 %>% mutate(PNC_pred = 464.68 * TRKDENSMAJ1000  + 7.2* RDMAJ100  + 18.86 * HOUSDEN100  + 7.63 * PointDe_Rest_100meters + 354.36 * ALLDIESAADT_DIS2 + 2771.03)
+
+summary(box_200_10092019$PNC_pred)
+
+#* then the summary of observed values (from "address_reviewer_comment_PN")
+
+# > summary(LUR_input_01$PN)
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# 3053    7053   10915   10504   12970   22811 
+
+# compared my final all 200 m predicted values with the original PNs...
+LUR_input_01 <- OA_LUR_input %>% mutate(PN = HOA + COA + 2771.2) # borrowed and leave ID inside...
+previous_cal_1 <- LUR_input_01 %>% dplyr::select(ID, PN)
+
+# cal_2 <- box_200_10092019 %>%  (well, if sth wrong, I will come back for the comparison)
+# now I am coming...
+cal_2 <- box_200_10092019 %>% dplyr::select(ID = Polygon200ID, PNC_pred) 
+
+#* the correlation
+final_cor <- cal_2 %>% inner_join(previous_cal_1) 
+cor(final_cor$PNC_pred, final_cor$PN)
+# 0.767^ 2 = 0.59
+# the true one is 0.64 coz the addition of 1km2 polygons. And they are close, I am good.
+
+box_200_10092019 %>% dplyr::select(Polygon200ID, PNC_pred) %>% write_csv('PNC_pred10092019.csv')

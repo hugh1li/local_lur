@@ -29,6 +29,8 @@ chi_LUR_input <- LUR_input %>% dplyr::select(-HOA, -COA, -chi) %>% inner_join(ch
 # add COA + HOA + background
 LUR_input_01 <- OA_LUR_input %>% dplyr::select(-ID) %>% mutate(PN = HOA + COA + 2771.2)
 
+summary(LUR_input_01$PN)
+
 LUR_input_02 = LUR_input_01[!duplicated(lapply(LUR_input_01, summary))]
 zero_filter = LUR_input_02 %>% map_dbl(~sum(.x == 0)/nrow(LUR_input_02))
 filter_25  = LUR_input_02 %>% map_dbl(~sum(.x == 25)/nrow(LUR_input_02))
